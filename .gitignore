@@ -1,0 +1,31 @@
+.cache
+.env
+.vscode
+.idea
+*.log
+*.pem
+coverage_api
+coverage_fe
+docker_volumes
+latest_corpus.ts
+log/
+node_modules
+package-lock.json
+public/assets/
+public/direct_upload/temp/*.jpg
+public/dist
+tmp
+api_docs.md
+erd_diagram.png
+erd.pdf
+*scratchpad*
+/config/master.key
+config/credentials.yml.enc
+# ActiveStorage blobs:
+storage/*
+
+# === Legacy
+public/system
+config/application.yml
+coverage
+mqtt/
