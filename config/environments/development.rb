@@ -1,4 +1,5 @@
 FarmBot::Application.configure do
+  config.action_controller.default_url_options = { host: ENV['API_HOST'] }
   config.action_controller.perform_caching = false
   config.action_mailer.default_url_options = {
     host: Rails.application.routes.default_url_options[:host],
@@ -9,6 +10,7 @@ FarmBot::Application.configure do
     address: ENV.fetch("API_HOST"),
     port: 1025,
   }
+  config.hosts << ENV['API_HOST']
   config.active_support.deprecation = :log
   config.assets.debug = true
   config.assets.digest = true

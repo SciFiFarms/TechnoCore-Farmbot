@@ -18,6 +18,9 @@ secrets:
   farmbot_farmbot_db_password:
     name: ${STACK_NAME:-technocore}_farmbot_farmbot_db_password
     external: true
+  farmbot_db_farmbot_password:
+    name: ${STACK_NAME:-technocore}_farmbot_db_farmbot_password
+    external: true
 
 services:
   # Uncomment this if Traefik will be used for routing traffick to this service.
@@ -55,10 +58,14 @@ services:
       #  reservations:
       #    memory: 64M
     environment:
-      # Sometimes you have to pass in ${DOMAIN} to enable the correct link paths to be generated.
-      # Othertimes you can use http:// or https:// for the website. Weird trick.
       #- MQTT_USER=${farmbot}
+      - POSTGRES_PASSWORD={{"{{DOCKER-SECRET:farmbot_db_password}}"}}
       - ADMIN_USER=${ADMIN_USER}
+      - API_HOST=farmbot.${DOMAIN}
+      - API_PORT=443
+      - MQTT_HOST=mqtt
+      - REDIS_URL=redis://farmbot_redis:6379/0
+
     image: ${image_provider:-scififarms}/technocore-farmbot:${TAG:-latest}
     logging:
       driver: "${LOGGING_DRIVER}"
@@ -67,13 +74,26 @@ services:
     networks:
       - farmbot
       - farmbot-private
-    #secrets:
-    #  - source: farmbot_farmbot_db_password
-    #    target: farmbot_db_password
+    secrets:
+      - source: farmbot_farmbot_db_password
+        target: farmbot_db_password
+      - source: farmbot_admin_password
+        target: admin_password
     volumes:
-      # Likely need to change this
-      - farmbot:/var/lib/farmbot
+      # Might need to delete farmbot volume.
+      #- farmbot:/farmbot
       - ${DEV_MOUNT_FARMBOT_SHELL_MIGRATIONS:-$EMPTY_MOUNT}
+
+  farmbot_redis:
+    deploy:
+      labels:
+        - com.ouroboros.enable=true
+      mode: global
+      restart_policy:
+        condition: any
+    image: redis:5-alpine
+    networks:
+      - farmbot-private
 
   farmbot_db:
     deploy:
@@ -82,7 +102,10 @@ services:
       mode: global
       restart_policy:
         condition: any
-    #environment:
+    environment:
+      - POSTGRES_USER=farmbot
+      - POSTGRES_PASSWORD={{"{{DOCKER-SECRET:farmbot_password}}"}}
+      - POSTGRES_DB=farmbot
     image: ${image_provider:-scififarms}/technocore-farmbot-db:${TAG:-latest}
     logging:
       driver: "${LOGGING_DRIVER}"
@@ -91,10 +114,8 @@ services:
     networks:
       - farmbot-private
     secrets:
-      - source: farmbot_db_admin_password
-        target: admin_password
       - source: farmbot_db_farmbot_password
         target: farmbot_password
     volumes:
-      # Likely need to change this
-      - farmbot-db:/var/lib/farmbot
+      - farmbot-db:/var/lib/postgresql/data
+      - /etc/localtime:/etc/localtime:ro

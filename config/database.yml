@@ -1,12 +1,12 @@
 default: &default
   adapter:  postgresql
   encoding: unicode
-  host:     db
+  host:     farmbot_db
   pool:     5
   # Need to change this?
   # See: ENV["DATABASE_URL"]
   # https://edgeguides.rubyonrails.org/configuring.html#configuring-a-database
-  username: postgres
+  username: <%= ENV["POSTGRES_USER"] || (puts "Warning- POSTGRES_USER not found.") %>
   password: <%= ENV["POSTGRES_PASSWORD"] || (puts "Warning - POSTGRES_PASSWORD not found.") %>
 development:
   <<: *default
