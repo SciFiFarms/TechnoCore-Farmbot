@@ -1,0 +1,13 @@
+version: "3.5"
+
+networks:
+  farmbot_db-pgadmin:
+
+services:
+  pgadmin:
+    networks:
+      - farmbot_db-pgadmin
+
+  farmbot_db:
+    networks:
+      - farmbot_db-pgadmin

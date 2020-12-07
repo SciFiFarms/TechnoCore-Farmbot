@@ -1,21 +1,23 @@
 version: "3.5"
 secrets:
-  mqtt_esphome_password:
-    name: ${STACK_NAME:-technocore}_mqtt_esphome_password
+  mqtt_farmbot_password:
+    name: ${STACK_NAME:-technocore}_mqtt_farmbot_password
     external: true
-  esphome_mqtt_password:
-    name: ${STACK_NAME:-technocore}_esphome_mqtt_password
+  farmbot_mqtt_password:
+    name: ${STACK_NAME:-technocore}_farmbot_mqtt_password
     external: true
 
 services:
   mqtt:
     networks:
-      - esphome
+      - farmbot-mqtt
     secrets:
-      - source: mqtt_esphome_password
-        target: users/esphome
+      - source: mqtt_farmbot_password
+        target: users/farmbot
 
-  esphome:
+  farmbot:
+    networks:
+      - farmbot-mqtt
     secrets:
-      - source: esphome_mqtt_password
+      - source: farmbot_mqtt_password
         target: mqtt_password
